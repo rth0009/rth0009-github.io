@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+	
+	body {
+	font: 10px sans-serif;
+	}
+	
+	.axis path,
+	.axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+	}
+	
+	.x.axis path {
+	display: none;
+	}
+	
+	.line {
+	fill: none;
+	stroke: steelblue;
+	stroke-width: 1.5px;
+	}
+	
+</style>
+<body>
+	<script src="//d3js.org/d3.v3.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	
+	<select multiple ="nation" id ="selection" style="height:300px">
+		<option value = "1">ALG</option>
+		<option value = "2">ARG</option>
+		<option value = "3">ARM</option>
+		<option value = "4">AUS</option>
+		<option value = "5">AUT</option>
+		<option value = "6">AZE</option>
+		<option value = "7">BAH</option>
+		<option value = "8">BAR</option>
+		<option value = "9">BEL</option>
+		<option value = "10">BEN</option>
+		<option value = "11">BER</option>
+		<option value = "12">BIH</option>
+		<option value = "13">BLR</option>
+		<option value = "14">BOL</option>
+		<option value = "15">BRA</option>
+		<option value = "16">BUL</option>
+		<option value = "17">CAN</option>
+		<option value = "18">CHI</option>
+		<option value = "19">CHN</option>
+		<option value = "20">CIV</option>
+		<option value = "21">COL</option>
+		<option value = "22">CRC</option>
+		<option value = "23">CRO</option>
+		<option value = "24">CUB</option>
+		<option value = "25">CYP</option>
+		<option value = "26">CZE</option>
+		<option value = "27">DEN</option>
+		<option value = "28">DOM</option>
+		<option value = "29">ECU</option>
+		<option value = "30">EGY</option>
+		<option value = "31">ESA</option>
+		<option value = "32">ESP</option>
+		<option value = "33">EST</option>
+		<option value = "34">FIN</option>
+		<option value = "35">FRA</option>
+		<option value = "36">GBR</option>
+		<option value = "37">GEO</option>
+		<option value = "38">GER</option>
+		<option value = "39">GRE</option>
+		<option value = "40">HAI</option>
+		<option value = "41">HKG</option>
+		<option value = "42">HUN</option>
+		<option value = "43">INA</option>
+		<option value = "44">IND</option>
+		<option value = "45">IRI</option>
+		<option value = "46">IRL</option>
+		<option value = "47">ISR</option>
+		<option value = "48">ITA</option>
+		<option value = "49">JAM</option>
+		<option value = "50">JPN</option>
+		<option value = "51">KAZ</option>
+		<option value = "52">KEN</option>
+		<option value = "53">KOR</option>
+		<option value = "54">KUW</option>
+		<option value = "55">LAT</option>
+		<option value = "56">LTU</option>
+		<option value = "57">LUX</option>
+		<option value = "58">MAR</option>
+		<option value = "59">MAS</option>
+		<option value = "60">MDA</option>
+		<option value = "61">MEX</option>
+		<option value = "62">MKD</option>
+		<option value = "63">MON</option>
+		<option value = "64">NED</option>
+		<option value = "65">NGR</option>
+		<option value = "66">NIG</option>
+		<option value = "67">NOR</option>
+		<option value = "68">NZL</option>
+		<option value = "69">PAK</option>
+		<option value = "70">PAR</option>
+		<option value = "71">PER</option>
+		<option value = "72">PHI</option>
+		<option value = "73">POL</option>
+		<option value = "74">POR</option>
+		<option value = "75">PUR</option>
+		<option value = "76">QAT</option>
+		<option value = "77">ROU</option>
+		<option value = "78">RSA</option>
+		<option value = "79">RUS</option>
+		<option value = "80">SEN</option>
+		<option value = "81">SLO</option>
+		<option value = "82">SRB</option>
+		<option value = "83">SRI</option>
+		<option value = "84">SUI</option>
+		<option value = "85">SVK</option>
+		<option value = "86">SWE</option>
+		<option value = "87">THA</option>
+		<option value = "88">TOG</option>
+		<option value = "89">TPE</option>
+		<option value = "90">TUN</option>
+		<option value = "91">TUR</option>
+		<option value = "92">UAE</option>
+		<option value = "93">UKR</option>
+		<option value = "94">UNK</option>
+		<option value = "95">URU</option>
+		<option value = "96">USA</option>
+		<option value = "97">UZB</option>
+		<option value = "98">VEN</option>
+		<option value = "99">VIE</option>
+		<option value = "100">YUG</option>
+		<option value = "101">ZIM</option>
+	</select>
+	
+	<button type='button' onclick='checkAll();'>All</button>
+	<button type='button' onclick='uncheckAll();'>Clear</button>
+	
+	<input id= "button1" type="button" value="Go" onClick="drawChart();">
+	<svg id="svgid"></svg>
+	<script>
+		drawChart();
+		function checkAll() {
+			d3.selectAll('option').property('selected', true);
+		};
+		function uncheckAll() {
+			d3.selectAll('option').property('selected', false);
+		};
+		
+		function drawChart(){
+			
+			document.getElementById("svgid").remove();
+			
+			var selements = $("#selection option:selected").text();
+			
+			var margin = {top: 20, right: 80, bottom: 30, left: 50},
+			width = 1500 - margin.left - margin.right,
+			height = 750 - margin.top - margin.bottom;
+			
+			var parseDate = d3.time.format("%Y").parse;
+			
+			var x = d3.time.scale()
+			.range([0, width]);
+			
+			var y = d3.scale.linear().domain([-20, 20])
+			.range([height, 0]);
+			
+			var color = d3.scale.category10();
+			
+			var xAxis = d3.svg.axis()
+			.scale(x)
+			.orient("bottom");
+			
+			var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left");
+			
+			var line = d3.svg.line()
+			.interpolate("basis")
+			.x(function(d) { return x(d.date); })
+			.y(function(d) { return y(d.gameDiff); });
+			
+			var svg = d3.select("body").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.attr("id","svgid")
+			.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			d3.tsv("data.tsv", function(error, data) {
+				if (error) throw error;
+				
+				var el = d3.keys(data[0]).filter(function(key) { return key !== "date"; });
+
+				color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+				if (selements != ""){
+					if (selements.length > 3){
+						selements = selements.match(/.{1,3}/g);
+      }
+				data.forEach(function(d){
+					el.forEach(function(e){
+						if ($.inArray(e,selements) == -1){
+							delete d[e]
+							}
+						});	
+				});
+				}
+				data.forEach(function(d) {
+					d.date = parseDate(d.date);
+				});
+				
+				var countries = color.domain().map(function(name) {
+					return {
+						name: name,
+						values: data.map(function(d) {
+							return {date: d.date, gameDiff: +d[name]};
+						})
+					};
+				});
+				
+				x.domain(d3.extent(data, function(d) { return d.date; }));
+				
+				y.domain([
+				d3.min(countries, function(c) { return d3.min(c.values, function(v) { return v.gameDiff; }); }),
+				d3.max(countries, function(c) { return d3.max(c.values, function(v) { return v.gameDiff; }); })
+				]);
+				
+				svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis);
+				
+				svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+				.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 6)
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text("Game Differential");
+				
+				var country = svg.selectAll(".country")
+				.data(countries)
+				.enter().append("g")
+				.attr("class", "country");
+				
+				country.append("path")
+				.attr("class", "line")
+				.attr("d", function(d) { return line(d.values); })
+				.style("stroke", function(d) { return color(d.name); });
+				
+				country.append("text")
+				.datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+				.attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.gameDiff) + ")"; })
+				.attr("x", 3)
+				.attr("dy", ".35em")
+				.text(function(d) { return d.name; 
+				});
+				});
+			};
+		</script>			
