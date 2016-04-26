@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
 
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  </head>
+  <body>
+
+  </body>
+</html>
+
+
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.browser text {
+  text-anchor: end;
+}
+
+</style>
+<body>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+<div style="position:absolute">
+  <select id="sel1" >
+    <option value=""selected>Select A Player</option>
+    <option value="Ilie Nastase">Ilie Nastase</option>
+    <option value="John Newcombe">John Newcombe</option>
+    <option value="Jimmy Connors">Jimmy Connors</option>
+    <option value="Bjorn Borg">Bjorn Borg</option>
+    <option value="Ivan Lendl">Ivan Lendl</option>
+    <option value="John McEnroe">John McEnroe</option>
+    <option value="Ivan Lendl">Ivan Lendl</option>
+    <option value="Mats Wilander">Mats Wilander</option>
+    <option value="Stefan Edberg">Stefan Edberg</option>
+    <option value="Boris Becker">Boris Becker</option>
+    <option value="Jim Courier">Jim Courier</option>
+    <option value="Pete Sampras">Pete Sampras</option>
+    <option value="Andre Agassi">Andre Agassi</option>
+    <option value="Thomas Muster">Thomas Muster</option>
+    <option value="Marcelo Rios">Marcelo Rios</option>
+    <option value="Carlos Moya">Carlos Moya</option>
+    <option value="Yevgeny Kafelnikov">Yevgeny Kafelnikov</option>
+    <option value="Patrick Rafter">Patrick Rafter</option>
+    <option value="Marat Safin">Marat Safin</option>
+    <option value="Gustavo Kuerten">Gustavo Kuerten</option>
+    <option value="Lleyton Hewitt">Lleyton Hewitt</option>
+    <option value="Juan Carlos Ferrero">Juan Carlos Ferrero</option>
+    <option value="Andy Roddick">Andy Roddick</option>
+    <option value="Roger Federer">Roger Federer</option>
+    <option value="Rafael Nadal">Rafael Nadal</option>
+    <option value="Novak Djokovic">Novak Djokovic</option>
+
+</select>
+<input id= "button1" type="button" value="Go">
+<svg id="svgid"></svg>
+</div>
+<script type = "text/javascript">
+
+      
+      document.getElementById("svgid").remove();
+
+  $("#button1").click(function(){
+    var PlayerName = $("#sel1").find("option:selected").text();
+
+    var fileName = "";
+
+fileName = PlayerName.replace(" ","") + ".tsv";
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 1500 - margin.left - margin.right,
+    height = 1000 - margin.top - margin.bottom;
+
+var parseDate = d3.time.format("%Y").parse,
+    formatNumber = d3.format("g");
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear().domain([-20, 20])
+    .range([height, 300]);
+  
+var color = d3.scale.category20();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(formatNumber)
+    .ticks(20);
+
+var area = d3.svg.area()
+    .x(function(d) { return x(d.Year); })
+    .y0(function(d) { return y(d.y0); })
+    .y1(function(d) { return y(d.y0 + d.y); });
+
+var stack = d3.layout.stack()
+    .values(function(d) { return d.values; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv(fileName, function(error, data) {
+  if (error) throw error;
+
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Year"; }));
+
+  data.forEach(function(d) {
+    d.Year = parseDate(d.Year);
+  });
+
+  var browsers = stack(color.domain().map(function(name) {
+    return {
+      name: name,
+      values: data.map(function(d) {
+        return {Year: d.Year, y: d[name] / 1};
+      })
+    };
+  }));
+
+  x.domain(d3.extent(data, function(d) { return d.Year; }));
+
+  var browser = svg.selectAll(".browser")
+      .data(browsers)
+    .enter().append("g")
+      .attr("class", "browser");
+
+  browser.append("path")
+      .attr("class", "area")
+      .attr("d", function(d) { return area(d.values); })
+      .style("fill", function(d) { return color(d.name); });
+
+  browser.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.Year) + "," + y(d.value.y0 + d.value.y / 2) + ")"; })
+      .attr("x", -6)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; });
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height/1.52 + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+});
+});
+
+</script>
